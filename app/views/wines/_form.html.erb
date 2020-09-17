@@ -1,0 +1,57 @@
+<%= form_with(model: wine, local: true) do |form| %>
+  <% if wine.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(wine.errors.count, "error") %> prohibited this wine from being saved:</h2>
+
+      <ul>
+      <% wine.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :strains %>
+    <%= form.collection_check_boxes(
+        :strain_ids,
+        @strains_availables, 
+        :id, 
+        :name) do |b| %> 
+          <%= b.label class: "label-checkbox" do %>
+            <%= b.check_box + b.text %>
+            <%= text_field( "wine[strains_percent]", b.value, value: @wine.getPercentageByStrainId(b.value) )%>
+          <%end %>
+    <% end %>
+  </div>
+
+  <% if @oenologists %>
+    <div class="field">
+      <%= form.label :score %>
+      <%= form.number_field :score %>
+    </div>
+
+    <div class="field">
+      <%= form.label :oenologists %>
+      <%= form.collection_check_boxes(
+          :oenologists,
+          @oenologists, 
+          :id, 
+          :name) do |o| %> 
+            <%= o.label class: "label-checkbox" do %>
+              <%= (@wine.oenologists.pluck(:id).include? (o.value)) ? o.check_box({checked: true}) : o.check_box %>
+              <%= o.text %>
+            <%end %>
+      <% end %>
+    </div>
+  <% end %>  
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
